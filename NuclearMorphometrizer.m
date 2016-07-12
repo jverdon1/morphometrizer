@@ -258,7 +258,7 @@ pause(.25);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %Filter out objects with small area
-    
+   
     for j = 1:numel(stats)
         if Area(j) < 250
             delInd(j) = 1;
@@ -275,17 +275,14 @@ pause(.25);
     for j = 1:length(stats)
       stats(j).C4 = handles.Ic4(handles.imgCount+1).Image(stats(j).PixelIdxList);
     end
+    handles.stats = stats;
+%     if (handles.imgCount)==0
+%        handles.stats = stats;
+%     else
+%        handles.stats = [handles.stats; stats];
+%     end
     
-    if (handles.imgCount)==0
-       handles.stats = stats;
-    else
-       handles.stats = [handles.stats; stats];
-    end
-    
-    
-%     handles.dna = zeros(length(stats),1);
-%     handles.NucRatio = zeros(length(stats),1);
-
+    handles.group = zeros(length(stats),1);
     guidata(hObject,handles);
      
     Segout = handles.Ifull(handles.imgCount+1).Image;
@@ -312,7 +309,7 @@ pause(.25);
 %         image(Segout);
         set(handles.image_frame,'XTick',[]);
         set(handles.image_frame,'YTick',[]);
-        zoom(2);
+        zoom(4);
     end
     hold on;
     set(handles.popupmenu1,'Visible','on');
@@ -407,8 +404,9 @@ end
 
 
 
-handles.group(handles.imgCount+1).class = zeros(length(handles.stats(handles.imgCount+1)),1);
-handles.group(handles.imgCount+1).class(CTCids) = 1;
+% handles.group(handles.imgCount+1).class = zeros(length(handles.stats(handles.imgCount+1)),1);
+% handles.group(handles.imgCount+1).class(CTCids) = 1;
+handles.group(CTCids) = 1;
 % CTCids
 % for k = 1 : numel(handles.stats)
 %     
@@ -444,14 +442,13 @@ hold on;
    
    
 %     
-%     outputFile = handles.ColorFiles{handles.imgCount+1};
+    outputFile = handles.ColorFiles{handles.imgCount+1};
    
-%     stats = handles.stats; group = handles.group; 
+    stats = handles.stats; group = handles.group; 
 %     dna = handles.dna; NucRatio = handles.NucRatio;
 %     disp('Hey still alive')
 %     imgCapt = getframe(handles.image_frame); imgCapt = imgCapt.cdata;
-%      save([get(handles.text_save_dir,'String') '\' outputFile '.mat'], 'stats','group',...
-%          'dna','NucRatio');
+     save([get(handles.text_save_dir,'String') '\' outputFile '.mat'], 'stats','group');
 %      imwrite(imgCapt,[get(handles.text_save_dir,'String') '\' outputFile]);
 %     print(handles.image_frame,strcat(handles.ColorFiles{handles.imgCount},...
 %         '.annotated.jpg'),'-djpeg');
@@ -502,7 +499,7 @@ else
     axes(handles.image_frame);
     set(handles.image_frame,'Visible','off');
 %     image(handles.Ifull);
-    zoom(0.5);
+    zoom(0.25);
     set(handles.image_frame,'XTick',[]);
     set(handles.image_frame,'YTick',[]);
     set(handles.progress_text,'String','Loading next image');
