@@ -186,13 +186,14 @@ pause(.25);
     if handles.imgCount == 0
         handles.bwl = struct; handles.stats = struct;
         handles.group = struct; handles.Ic1 = struct;
-%         handles.Ic2 = struct; %handles.Ic3 = struct;
+%         handles.Ic2 = struct; 
+        handles.Ic3 = struct;
         handles.Ic4 = struct; handles.Ifull = struct;
         [handles.bwl(1:length(handles.ColorFiles)).bw] = deal([]);
         [handles.bwl(1:length(handles.ColorFiles)).Icut] = deal([]);
         [handles.Ic1(1:length(handles.ColorFiles)).Image] = deal([]);
 %         [handles.Ic2(1:length(handles.ColorFiles)).Image] = deal([]);
-        %[handles.Ic3(1:length(handles.ColorFiles)).Image] = deal([]);
+        [handles.Ic3(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.Ic4(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.Ifull(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.group(1:length(handles.ColorFiles)).class] = deal([]);
@@ -211,8 +212,8 @@ pause(.25);
 %     handles.Ic2(handles.imgCount+1).Image = ...
 %         imread(handles.C2Files{handles.imgCount+1});
     
-    % handles.Ic3(handles.imgCount+1).Image = ...
-        %imread(handles.C3Files{handles.imgCount+1});
+    handles.Ic3(handles.imgCount+1).Image = ...
+        imread(handles.C3Files{handles.imgCount+1});
         
     handles.Ic4(handles.imgCount+1).Image = ...
         imread(handles.C4Files{handles.imgCount+1});
@@ -271,9 +272,11 @@ pause(.25);
     for m = 1:length(delIndShort)
         stats(delIndShortSort(m)) = [];
     end
+    [stats(:).C3] = deal([]);
     [stats(:).C4] = deal([]);
     for j = 1:length(stats)
-      stats(j).C4 = handles.Ic4(handles.imgCount+1).Image(stats(j).PixelIdxList);
+        stats(j).C3 = handles.Ic3(handles.imgCount+1).Image(stats(j).PixelIdxList);
+        stats(j).C4 = handles.Ic4(handles.imgCount+1).Image(stats(j).PixelIdxList);
     end
     handles.stats = stats;
 %     if (handles.imgCount)==0
@@ -286,7 +289,7 @@ pause(.25);
     guidata(hObject,handles);
      
     Segout = handles.Ifull(handles.imgCount+1).Image;
-    if numel(stats) ~= 0
+%     if numel(stats) ~= 0
         for i = 1:size(Segout,1)
             for j = 1:size(Segout,2)
                 if perim(i,j) ==1
@@ -310,7 +313,7 @@ pause(.25);
         set(handles.image_frame,'XTick',[]);
         set(handles.image_frame,'YTick',[]);
         zoom(4);
-    end
+%     end
     hold on;
     set(handles.popupmenu1,'Visible','on');
     set(handles.response_text,'String','Choose the # of Good CTC Nuclei from Dropdown');
@@ -394,7 +397,7 @@ if handles.CTCnum~=0
     for i = 1:handles.CTCnum;
         for j = 1:length(handles.stats)
             
-            temp = find(ismember(handles.stats(j).PixelList,floor([x(i) y(i)])),1);
+            temp = find(ismember(handles.stats(j).PixelList,floor([x(i) y(i)]),'rows'));
             if ~isempty(temp)
                 CTCids(i) = j;
             end
@@ -427,18 +430,18 @@ set(handles.image_frame,'YTick',[]);
 
 hold on;    
 
-% for k = 1 : numel(handles.stats)
-%     if handles.group(k)==1
+for k = 1 : numel(handles.stats)
+    if handles.group(k)==1
 %         text(handles.stats(k).Centroid(1),handles.stats(k).Centroid(2), ...
 %             sprintf('%1.3f', handles.NucRatio(k)),'Color','w',...
 %             'HorizontalAlignment','center');
-%         
-%         rectangle('Position',[handles.stats(k).BoundingBox(1),handles.stats(k).BoundingBox(2),...
-%             handles.stats(k).BoundingBox(3),handles.stats(k).BoundingBox(4)],...
-%             'EdgeColor','r','LineWidth',3 )
-%         %             sum([handles.stats(k).Nucleoli].')./handles.dna(k))
-%     end
-% end
+        
+        rectangle('Position',[handles.stats(k).BoundingBox(1),handles.stats(k).BoundingBox(2),...
+            handles.stats(k).BoundingBox(3),handles.stats(k).BoundingBox(4)],...
+            'EdgeColor','r','LineWidth',3 )
+        %             sum([handles.stats(k).Nucleoli].')./handles.dna(k))
+    end
+end
    
    
 %     
