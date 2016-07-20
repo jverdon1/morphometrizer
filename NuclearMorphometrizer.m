@@ -1,15 +1,15 @@
 function varargout = NuclearMorphometrizer(varargin)
-% NUCLEARMORPHOMETRIZER MATLAB code for NuclearMorphometrizer.fig
-%      NUCLEARMORPHOMETRIZER, by itself, creates a new NUCLEARMORPHOMETRIZER or raises the existing
+% NuclearMORPHOMETRIZER MATLAB code for NuclearMorphometrizer.fig
+%      NuclearMORPHOMETRIZER, by itself, creates a new NuclearMORPHOMETRIZER or raises the existing
 %      singleton*.
 %
-%      H = NUCLEARMORPHOMETRIZER returns the handle to a new NUCLEARMORPHOMETRIZER or the handle to
+%      H = NuclearMORPHOMETRIZER returns the handle to a new NuclearMORPHOMETRIZER or the handle to
 %      the existing singleton*.
 %
-%      NUCLEARMORPHOMETRIZER('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in NUCLEARMORPHOMETRIZER.M with the given input arguments.
+%      NuclearMORPHOMETRIZER('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in NuclearMORPHOMETRIZER.M with the given input arguments.
 %
-%      NUCLEARMORPHOMETRIZER('Property','Value',...) creates a new NUCLEARMORPHOMETRIZER or raises the
+%      NuclearMORPHOMETRIZER('Property','Value',...) creates a new NuclearMORPHOMETRIZER or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
 %      applied to the GUI before NuclearMorphometrizer_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
@@ -22,8 +22,8 @@ function varargout = NuclearMorphometrizer(varargin)
 
 % Edit the above text to modify the response to help NuclearMorphometrizer
 
-% Last Modified by GUIDE v2.5 17-Jun-2016 11:10:48
-% Updated by James Verdone, Johns Hopkins School of Medicine, 6/17/2016
+% Last Modified by GUIDE v2.5 14-Jul-2016 13:55:54
+% Updated by James Verdone, Johns Hopkins School of Medicine, 7/14/16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -90,7 +90,8 @@ C1Files = cell(length(Files),1);
 C2Files = cell(length(Files),1);
 C3Files = cell(length(Files),1); %Uncomment for loading C3 images
 C4Files = cell(length(Files),1);
-
+C5Files = cell(length(Files),1);
+C6Files = cell(length(Files),1);
 
 handles.imgCount = 0;
 handles.filesLoaded = 1;
@@ -104,6 +105,8 @@ for i = 1:length(Files);
     k = strfind(Files(i).name,'C2-');
     l = strfind(Files(i).name,'C3-'); %Uncomment for loading C3 images
     m = strfind(Files(i).name,'C4-');
+    n = strfind(Files(i).name,'C5-');
+    o = strfind(Files(i).name,'C6-');
     
     if isempty(j) == 0
         C1Files{i} = Files(i).name;
@@ -113,6 +116,10 @@ for i = 1:length(Files);
         C3Files{i} = Files(i).name; %Uncomment for loading C3 images
     elseif isempty(m) == 0
         C4Files{i} = Files(i).name;
+    elseif isempty(n) == 0
+        C5Files{i} = Files(i).name;
+    elseif isempty(o) == 0
+        C6Files{i} = Files(i).name;
     else
         ColorFiles{i} = Files(i).name;
     end
@@ -125,11 +132,15 @@ C1Files(all(cellfun('isempty',C1Files),2),:) = [];
 C2Files(all(cellfun('isempty',C2Files),2),:) = [];
 C3Files(all(cellfun('isempty',C3Files),2),:) = [];
 C4Files(all(cellfun('isempty',C4Files),2),:) = [];
+C5Files(all(cellfun('isempty',C5Files),2),:) = [];
+C6Files(all(cellfun('isempty',C6Files),2),:) = [];
 
 handles.C1Files = C1Files;
 handles.C2Files = C2Files;
 handles.C3Files = C3Files;
 handles.C4Files = C4Files;
+handles.C5Files = C5Files;
+handles.C6Files = C6Files;
 handles.ColorFiles = ColorFiles;
 guidata(hObject,handles);
 
@@ -186,15 +197,19 @@ pause(.25);
     if handles.imgCount == 0
         handles.bwl = struct; handles.stats = struct;
         handles.group = struct; handles.Ic1 = struct;
-%         handles.Ic2 = struct; 
+        handles.Ic2 = struct; 
         handles.Ic3 = struct;
-        handles.Ic4 = struct; handles.Ifull = struct;
+        handles.Ic4 = struct; 
+        handles.Ic5 = struct;
+        handles.Ic6 = struct; handles.Ifull = struct;
         [handles.bwl(1:length(handles.ColorFiles)).bw] = deal([]);
         [handles.bwl(1:length(handles.ColorFiles)).Icut] = deal([]);
         [handles.Ic1(1:length(handles.ColorFiles)).Image] = deal([]);
-%         [handles.Ic2(1:length(handles.ColorFiles)).Image] = deal([]);
+      [handles.Ic2(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.Ic3(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.Ic4(1:length(handles.ColorFiles)).Image] = deal([]);
+         [handles.Ic5(1:length(handles.ColorFiles)).Image] = deal([]);
+          [handles.Ic6(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.Ifull(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.group(1:length(handles.ColorFiles)).class] = deal([]);
         guidata(hObject,handles);
@@ -209,8 +224,8 @@ pause(.25);
     handles.Ic1(handles.imgCount+1).Image = ...
         imread(handles.C1Files{handles.imgCount+1});
     
-%     handles.Ic2(handles.imgCount+1).Image = ...
-%         imread(handles.C2Files{handles.imgCount+1});
+     handles.Ic2(handles.imgCount+1).Image = ...
+         imread(handles.C2Files{handles.imgCount+1});
     
     handles.Ic3(handles.imgCount+1).Image = ...
         imread(handles.C3Files{handles.imgCount+1});
@@ -218,15 +233,29 @@ pause(.25);
     handles.Ic4(handles.imgCount+1).Image = ...
         imread(handles.C4Files{handles.imgCount+1});
     
+     handles.Ic5(handles.imgCount+1).Image = ...
+        imread(handles.C5Files{handles.imgCount+1});
+    
+     handles.Ic6(handles.imgCount+1).Image = ...
+        imread(handles.C6Files{handles.imgCount+1});
+    
     handles.Ifull(handles.imgCount+1).Image = ...
         imread(handles.ColorFiles{handles.imgCount+1});
     
     guidata(hObject,handles);
     %image(Ifull);
     
+    
+    
+    
+    %up to this point C6 is encoded
+    
+    
     %Edit watershed segmentation variables here as necessary%
     Blur = 2;
-    Threshold = 0.30;
+    ThresholdC1 = 0.3;
+    ThresholdC2 = 0.3;
+    ThresholdC4 = 0.15;
     minArea = 200; maxArea = 1*10^10;
     WaterShedRegressConst = 2;
     
@@ -234,66 +263,121 @@ pause(.25);
     %Process Images Below%
     %%%%%%%%%%%%%%%%%%%%%%
     
+    
+    
+    
+    
+    
+    
+    
+    
     %Perform watershed algorithm on greyscale DAPI Image
+    % Define perimeter of nucleus using C1 which should have DAPI nuclear
+    % marker
+%     
+    IeqC1 = adapthisteq(handles.Ic1(handles.imgCount+1).Image);
+    IFiltC1 = imgaussfilt(IeqC1,Blur);
+    IThresC1 = im2bw(IFiltC1, ThresholdC1);
+    ICleanC1 = bwareafilt(IThresC1,[minArea maxArea]);
+    DC1 = bwdist(~ICleanC1);
+    DC1 = -DC1;
+    maskC1 = imextendedmin(DC1,WaterShedRegressConst);
+    D2C1 = imimposemin(DC1,maskC1);
+    D2C1(~ICleanC1) = -Inf;
+    Ld2C1 = watershed(D2C1);
+    IcutC1 = ICleanC1;
+    IcutC1(Ld2C1 ==0)=0;
+%     handles.bwl(handles.imgCount+1).bw = bwlabel(IcutC1,8);
+%     handles.bwl(handles.imgCount+1).Icut = IcutC1;
+    perimC1 = bwperim(IcutC1);
     
-    Ieq = adapthisteq(handles.Ic1(handles.imgCount+1).Image);
-    IFilt = imgaussfilt(Ieq,Blur);
-    IThres = im2bw(IFilt, Threshold);
-    IClean = bwareafilt(IThres,[minArea maxArea]);
-    D = bwdist(~IClean);
-    D = -D;
-    mask = imextendedmin(D,WaterShedRegressConst);
-    D2 = imimposemin(D,mask);
-    D2(~IClean) = -Inf;
-    Ld2 = watershed(D2);
-    Icut = IClean;
-    Icut(Ld2 ==0)=0;
-    handles.bwl(handles.imgCount+1).bw = bwlabel(Icut,8);
-    handles.bwl(handles.imgCount+1).Icut = Icut;
-    perim = bwperim(Icut);
-    
-       
-    stats =  regionprops(Icut,handles.Ic1(handles.imgCount+1).Image,'all');
-    Area = [stats.Area].';
-    delInd = zeros(1,length(Area));
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %Filter out objects with small area
    
-    for j = 1:numel(stats)
-        if Area(j) < 250
-            delInd(j) = 1;
-        end
-    end
+    handles.statsC1 =  regionprops(IcutC1,handles.Ic1(handles.imgCount+1).Image,'all');
+    AreaC1 = [handles.statsC1.Area].';
+    delIndC1 = zeros(1,length(AreaC1));
     
-    delIndShort = find(delInd);
-    delIndShortSort = sort(delIndShort,'descend');
+   
+    % Define perimeter of cytoplasm using C2
+%     
+    IeqC2 = adapthisteq(handles.Ic2(handles.imgCount+1).Image);
+    IFiltC2 = imgaussfilt(IeqC2,Blur);
+    IThresC2 = im2bw(IFiltC2, ThresholdC2);
+    ICleanC2 = bwareafilt(IThresC2,[minArea maxArea]);
+    DC2 = bwdist(~ICleanC2);
+    DC2 = -DC2;
+    maskC2 = imextendedmin(DC2,WaterShedRegressConst);
+    D2C2 = imimposemin(DC2,maskC2);
+    D2C2(~ICleanC2) = -Inf;
+    Ld2C2 = watershed(D2C2);
+    IcutC2 = ICleanC2;
+    IcutC2(Ld2C2 ==0)=0;
+    perimC2 = bwperim(IcutC2);
+    handles.statsC2 =  regionprops(IcutC2,handles.Ic2(handles.imgCount+1).Image,'all');
+    AreaC2 = [handles.statsC2.Area].';
+    delIndC2 = zeros(1,length(AreaC2));
     
-    for m = 1:length(delIndShort)
-        stats(delIndShortSort(m)) = [];
-    end
-    [stats(:).C3] = deal([]);
-    [stats(:).C4] = deal([]);
-    for j = 1:length(stats)
-        stats(j).C3 = handles.Ic3(handles.imgCount+1).Image(stats(j).PixelIdxList);
-        stats(j).C4 = handles.Ic4(handles.imgCount+1).Image(stats(j).PixelIdxList);
-    end
-    handles.stats = stats;
-%     if (handles.imgCount)==0
-%        handles.stats = stats;
-%     else
-%        handles.stats = [handles.stats; stats];
+ % Code to create perimeter for C4 (prostate specific marker) is below:  
+    
+    IeqC4 = adapthisteq(handles.Ic4(handles.imgCount+1).Image);
+    IFiltC4 = imgaussfilt(IeqC4,Blur);
+    IThresC4 = im2bw(IFiltC4, ThresholdC4);
+    ICleanC4 = bwareafilt(IThresC4,[minArea maxArea]);
+    DC4 = bwdist(~ICleanC4);
+    DC4 = -DC4;
+    maskC4 = imextendedmin(DC4,WaterShedRegressConst);
+    D2C4 = imimposemin(DC4,maskC4);
+    D2C4(~ICleanC4) = -Inf;
+    Ld2C4 = watershed(D2C4);
+    IcutC4 = ICleanC4;
+    IcutC4(Ld2C4 ==0)=0;
+    perimC4 = bwperim(IcutC4);
+
+    handles.statsC4 =  regionprops(IcutC4,handles.Ic4(handles.imgCount+1).Image,'all');
+    AreaC4 = [handles.statsC4.Area].';
+    delIndC4 = zeros(1,length(AreaC4));
+    
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     %Filter out objects with small area for C1
+%    
+%     for j = 1:numel(statsC1)
+%         if AreaC1(j) < 250
+%             delIndC1(j) = 1;
+%         end
 %     end
-    
-    handles.group = zeros(length(stats),1);
+%     
+%     delIndShort = find(delIndC1);
+%     delIndShortSort = sort(delIndShort,'descend');
+%     
+%     for m = 1:length(delIndShort)
+%         stats(delIndShortSort(m)) = [];
+%     end
+%     [stats(:).C3] = deal([]);
+%     [stats(:).C4] = deal([]);
+%     for j = 1:length(stats)
+%         stats(j).C3 = handles.Ic3(handles.imgCount+1).Image(stats(j).PixelIdxList);
+%         stats(j).C4 = handles.Ic4(handles.imgCount+1).Image(stats(j).PixelIdxList);
+%     end
+
+
+%Begin drawing C4 perimeter
+
+   
+    handles.group = zeros(length(handles.statsC4),1);
     guidata(hObject,handles);
      
     Segout = handles.Ifull(handles.imgCount+1).Image;
 %     if numel(stats) ~= 0
         for i = 1:size(Segout,1)
             for j = 1:size(Segout,2)
-                if perim(i,j) ==1
-                    Segout(i,j,:) = 255;
+                
+                if perimC1(i,j) ==1
+                   Segout(i,j,:) = 255;
+                end
+                
+                if perimC4(i,j) ==1
+                    Segout(i,j,1) = 255;
+                    Segout(i,j,2) = 0;
+                    Segout(i,j,3) = 0;
                 end
             end
         end
@@ -312,13 +396,13 @@ pause(.25);
 %         image(Segout);
         set(handles.image_frame,'XTick',[]);
         set(handles.image_frame,'YTick',[]);
-        zoom(4);
+         zoom(4);
 %     end
     hold on;
     set(handles.popupmenu1,'Visible','on');
-    set(handles.response_text,'String','Choose the # of Good CTC Nuclei from Dropdown');
-    
+    set(handles.response_text,'String','Choose the # of Good Nuclear Nuclei from Dropdown');
 
+    
 
 return;
 
@@ -337,10 +421,10 @@ function popupmenu1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 numberPicked = get(hObject,'Value');
-set(handles.response_text,'String',strcat(num2str(numberPicked),' CTC(s) properly segmented!'));
+set(handles.response_text,'String',strcat(num2str(numberPicked),' Nuclear(s) properly segmented!'));
 pause(1);
-set(handles.response_text,'String','Click the "Choose Nuclei" button, then click any CTC nuclei');
-handles.CTCnum = numberPicked;
+set(handles.response_text,'String','Click the "Choose Nuclei" button, then click any Nuclear nuclei');
+handles.Nuclearnum = numberPicked;
 set(handles.pushbutton_nuc_crossing,'Enable','on');
 guidata(hObject,handles);
 set(handles.popupmenu1,'Visible','off');
@@ -381,8 +465,8 @@ function pushbutton_nuc_crossing_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 set(handles.pushbutton_nuc_crossing,'Enable','off');
 guidata(hObject,handles);
-[x,y] = ginput(handles.CTCnum);
-CTCids = zeros(handles.CTCnum,1);
+[x,y] = ginput(handles.Nuclearnum);
+Nuclearids = zeros(handles.Nuclearnum,1);
 axes(handles.image_frame);
 
 image(handles.Ifull(handles.imgCount+1).Image); 
@@ -393,13 +477,13 @@ set(handles.response_text,'String','Please wait while computer processes your ce
 guidata(hObject,handles);
 pause(.2);
 
-if handles.CTCnum~=0
-    for i = 1:handles.CTCnum;
-        for j = 1:length(handles.stats)
+if handles.Nuclearnum~=0
+    for i = 1:handles.Nuclearnum;
+        for j = 1:length(handles.statsC1)
             
-            temp = find(ismember(handles.stats(j).PixelList,floor([x(i) y(i)]),'rows'));
+            temp = find(ismember(handles.statsC1(j).PixelList,floor([x(i) y(i)]),'rows'));
             if ~isempty(temp)
-                CTCids(i) = j;
+                Nuclearids(i) = j;
             end
         end
     end
@@ -408,9 +492,9 @@ end
 
 
 % handles.group(handles.imgCount+1).class = zeros(length(handles.stats(handles.imgCount+1)),1);
-% handles.group(handles.imgCount+1).class(CTCids) = 1;
-handles.group(CTCids) = 1;
-% CTCids
+% handles.group(handles.imgCount+1).class(Nuclearids) = 1;
+handles.group(Nuclearids) = 1;
+% Nuclearids
 % for k = 1 : numel(handles.stats)
 %     
 %         handles.NucRatio(k) = [handles.stats(k).MajorAxisLength].'/...
@@ -429,29 +513,247 @@ set(handles.image_frame,'XTick',[]);
 set(handles.image_frame,'YTick',[]);
 
 hold on;    
+%define centroids of perimeters C1, C2, C4
 
-for k = 1 : numel(handles.stats)
-    if handles.group(k)==1
-%         text(handles.stats(k).Centroid(1),handles.stats(k).Centroid(2), ...
-%             sprintf('%1.3f', handles.NucRatio(k)),'Color','w',...
-%             'HorizontalAlignment','center');
-        
-        rectangle('Position',[handles.stats(k).BoundingBox(1),handles.stats(k).BoundingBox(2),...
-            handles.stats(k).BoundingBox(3),handles.stats(k).BoundingBox(4)],...
-            'EdgeColor','r','LineWidth',3 )
-        %             sum([handles.stats(k).Nucleoli].')./handles.dna(k))
+centroidC1 = zeros(length(handles.statsC1),2);
+centroidC2 = zeros(length(handles.statsC2),2);
+centroidC4 = zeros(length(handles.statsC4),2);
+
+for i = 1:length(handles.statsC1)
+    centroidC1(i,:) = handles.statsC1(i).Centroid(:);
+end
+for i = 1:length(handles.statsC2)
+    centroidC2(i,:) = handles.statsC2(i).Centroid(:);
+end
+for i = 1:length(handles.statsC4)
+    centroidC4(i,:) = handles.statsC4(i).Centroid(:);
+end
+
+% Find closest C2 and C4 blob to the C1 blob
+Dist4 = zeros(size(centroidC1,1),size(centroidC4,1));
+Dist2 = zeros(size(centroidC1,1),size(centroidC2,1));
+for i = 1:size(centroidC1,1)
+    for j = 1:size(centroidC4,1)
+        Dist4(i,j) = sqrt((centroidC1(i,1)-centroidC4(j,1))^2+(centroidC1(i,2)-centroidC4(j,2))^2 );
+    end
+    for k = 1:size(centroidC2,1)
+        Dist2(i,k) = sqrt((centroidC1(i,1)-centroidC2(k,1))^2+(centroidC1(i,2)-centroidC2(k,2))^2 );
     end
 end
+
+
+    
+minDistIdx4 = zeros(length(handles.statsC1),1);
+minDist4 = zeros(length(handles.statsC1),1);
+for i = 1:length(minDistIdx4)
+   [minDist4(i), minDistIdx4(i)] = min(Dist4(i,:));
+end
+
+
+minDistIdx2 = zeros(length(handles.statsC1),1);
+minDist2 = zeros(length(handles.statsC1),1);
+for i = 1:length(minDistIdx2)
+   [minDist2(i), minDistIdx2(i)] = min(Dist2(i,:));
+end
+
+%define Areas of C1, C2, C4
+
+AreaC1 = [handles.statsC1(:).Area].';
+AreaC2 = [handles.statsC2(minDistIdx2).Area].';
+AreaC4 = [handles.statsC4(minDistIdx4).Area].';
+
+
+
+
+% MASTER EQUATION
+% C1 dapi
+% c2 ck
+% c3 cs
+% c4 nucleolin
+% 
+
+% !!!!!!exclude things too far away instead of matching!!!!!!!
+
+
+
+
+
+
+% 
+% 
+% master equation
+% 
+% c1 area
+AreaC1;
+
+% c1 amount
+
+C1sum = zeros(length(handles.statsC1),1);
+for i = 1:length(handles.statsC1)
+    C1sum(i) = sum(handles.statsC1(i).PixelValues);
+end
+
+% c2 area
+AreaC2;
+
+% c2 amount
+C2sum = zeros(length(handles.statsC1),1);
+for i = 1:length(handles.statsC1)
+    C2sum(i) = sum(handles.statsC2(minDistIdx2(i)).PixelValues);
+end
+
+
+% amount of c4 in c1 nucleolin in nucleus
+
+C4img = handles(handles.imgCount+1).Ic4;
+
+C4overC1 = struct;
+[C4overC1(1:length(handles.statsC1)).Ic4] = deal([]);
+C4overC1sum = zeros(length(handles.statsC1),1);
+[C4overC1(1:length(handles.statsC1)).pixels] = deal([]);
+
+for i = 1:length(handles.statsC1)
+  
+    C4overC1(i).Ic4 = im2double(handles.statsC1(i).Image);
+    C4overC1(i).pixels = C4img.Image(handles.statsC1(i).PixelIdxList);
+    temp= find(C4overC1(i).Ic4); C4overC1(i).Ic4(temp) = C4overC1(i).pixels;
+    C4overC1sum(i) = sum(C4overC1(i).pixels);
+
+
+end
+
+
+% c4 in c1 entropy nucleolin staining pattern
+[C4overC1(1:length(handles.statsC1)).wentropy] = deal([]);
+for i = 1:length(handles.statsC1)
+   C4overC1(i).wentropyC4 = wentropy(C4overC1(i).Ic4,'shannon'); 
+end
+wentropyC4 = [C4overC1(:).wentropyC4].';
+
+% amount of c4 in c2 nucleolin in the "cell" 
+
+
+
+C4overC2 = struct;
+[C4overC2(1:length(minDistIdx2)).Ic4] = deal([]);
+C4overC2sum = zeros(length(minDistIdx2),1);
+[C4overC2(1:length(minDistIdx2)).pixels] = deal([]);
+for i = 1:length(minDistIdx2)
+  
+    C4overC2(i).Ic4 = im2double(handles.statsC2(minDistIdx2(i)).Image);
+    C4overC2(i).pixels = C4img.Image(handles.statsC2(minDistIdx2(i)).PixelIdxList);
+    temp= find(C4overC2(i).Ic4); C4overC2(i).Ic4(temp) = C4overC2(i).pixels;
+    C4overC2sum(i) = sum(C4overC2(i).pixels);
+
+
+end
+
+
+% counts against your score
+% amount of c3 in c1 counterstain in "cell" 
+
+
+C3img = handles(handles.imgCount+1).Ic3;
+
+C3overC1 = struct;
+[C3overC1(1:length(handles.statsC1)).Ic3] = deal([]);
+C3overC1sum = zeros(length(handles.statsC1),1);
+[C3overC1(1:length(handles.statsC1)).pixels] = deal([]);
+for i = 1:length(handles.statsC1)
+  
+    C3overC1(i).Ic3 = im2double(handles.statsC1(i).Image);
+    C3overC1(i).pixels = C3img.Image(handles.statsC1(i).PixelIdxList);
+    temp= find(C3overC1(i).Ic3); C3overC1(i).Ic3(temp) = C3overC1(i).pixels;
+    C3overC1sum(i) = sum(C3overC1(i).pixels);
+
+
+end
+
+handles.statsC1(Nuclearids(1)).Image
+
+%EQUATION COMPONENTS:
+% AreaC1 % c1 area 2 size 20
+% C1sum % c1 amount 3  10
+% AreaC2 % c2 area 2 size 20
+% C2sum % c2 amount 1 presence of keratin 100
+% C4overC1sum % amount of c4 in c1 nucleolin in nucleus 2 20
+% wentropyC4 % c4 in c1 entropy nucleolin staining pattern 2 20
+% C4overC2sum % amount of c4 in c2 nucleolin in the "cell" 3 10
+% 
+% C3overC1sum  % amount of c3 in c1 counterstain in "cell" % counts against
+% your score 2 20 
+% if minDist2 is too large then equation is assigned really
+% score 50 *****
+% dividing by minDist2****
+eqData = [AreaC1,C1sum,AreaC2,C2sum,C4overC1sum,wentropyC4,C4overC2sum,C3overC1sum,minDist2];
+% median(AreaC1)/210
+% median(C1sum)/210
+% median(AreaC2)/210
+% median(C2sum)/210
+% median(C4overC1sum)/210
+% median(wentropyC4)/210
+% median(C4overC2sum)/210
+% median(C3overC1sum)/210
+% median(minDist2)/210
+% median(minDist4)/210
+% % 
+% % equation
+a= 20/6.21;
+b= 10/474;
+c= 20/1;
+d= 100/97.5;
+e= 20/65.8;
+f= -20/3330; %because wentropy is negative
+g= 10/22.3;
+%h and i should be negative
+h= -20/246;
+i= -50/4.47;
+equation = a*AreaC1+b*C1sum+(c*AreaC2./minDist2)+(d*C2sum./minDist2)...
+    +e*C4overC1sum+f*wentropyC4+(g*C4overC2sum./minDist2)+h*C3overC1sum+i*minDist2
+
+
+
+
+% 
+[~,maxIdx]=max(equation);
+
+ rectangle('Position',[handles.statsC1(maxIdx).BoundingBox(1),handles.statsC1(maxIdx).BoundingBox(2),...
+            handles.statsC1(maxIdx).BoundingBox(3),handles.statsC1(maxIdx).BoundingBox(4)],...
+            'EdgeColor','g','LineWidth',3 )
+
+
+
+
+
+
+% 
+% 
+% RECTANGLZ DO NOT DELETE PER JAMES OR ELSE!
+% 
+% for k = 1 : numel(handles.statsC1)
+%     if handles.group(k)==1
+% %         centroidstring(i)=[num2str(handles.statsC1(k).Centroid(1)),', ',num2str(handles.statsC1(k).Centroid(2))];
+%         
+%         
+%         rectangle('Position',[handles.statsC1(k).BoundingBox(1),handles.statsC1(k).BoundingBox(2),...
+%             handles.statsC1(k).BoundingBox(3),handles.statsC1(k).BoundingBox(4)],...
+%             'EdgeColor','g','LineWidth',3 )
+%         %             sum([handles.stats(k).Nucleoli].')./handles.dna(k))
+%     end
+%     
+%    
+% end
+
    
    
 %     
     outputFile = handles.ColorFiles{handles.imgCount+1};
    
-    stats = handles.stats; group = handles.group; 
+    statsC1 = handles.statsC1; group = handles.group; 
 %     dna = handles.dna; NucRatio = handles.NucRatio;
 %     disp('Hey still alive')
 %     imgCapt = getframe(handles.image_frame); imgCapt = imgCapt.cdata;
-     save([get(handles.text_save_dir,'String') '\' outputFile '.mat'], 'stats','group');
+     save([get(handles.text_save_dir,'String') '\' outputFile '.mat'], 'equation','group');
 %      imwrite(imgCapt,[get(handles.text_save_dir,'String') '\' outputFile]);
 %     print(handles.image_frame,strcat(handles.ColorFiles{handles.imgCount},...
 %         '.annotated.jpg'),'-djpeg');
@@ -555,41 +857,14 @@ function pushbutton_quant_stain_Callback(hObject, eventdata, handles)
 % widenElement = strel('disk',10,4);
 set(handles.response_text,'String',...
     'Please wait, this could take up to 1 minute per image read');
-guidata(hObject,handles);
-% handles.statsWide = struct;
-handles.totalLength = 0;
-% for r = 1:length(handles.ColorFiles)
-%     handles.totalLength = handles.totalLength + length(handles.group(r).class);
-%     if r ==1
-%         group = [handles.group(r).class].';
-%     else
-%         group = [group; handles.group(r).class.'];
-%     end
-%     
-% end
-% count = 0;
-% for r = 1:length(handles.ColorFiles)
-%     
-%     for i = 1:max(max(handles.bwl(r).bw))
-%         count = count +1;
-%         Ionly = zeros(size(handles.bwl(r).Icut));
-%         Ionly((handles.bwl(r).bw==i)) = 1;
-%         IonlyWide = imdilate(Ionly,widenElement);
-%         if (i ==1 && r ==1)
-%             handles.statsWide = regionprops(IonlyWide,handles.Ic4(r).Image,'all');
-%             %            statsWideC3 = regionprops(IonlyWide,Ic3,'all');
-%             %             statsWideC4 = regionprops(IonlyWide,Ic4,'all');
-%             [handles.statsWide(2:handles.totalLength).Image] = deal([]);
-%             %            [statsWideC3(2:max(max(bwl))).Area] = deal([]);
-%             %            [statsWideC4(2:max(max(bwl))).Area] = deal([]);
-%         else
-%             statsWide = regionprops(IonlyWide,'Image','PixelList');
-%             handles.statsWide(count) = statsWide;
-%         end
-%     end
-%     
-% end
-% statsWide = handles.statsWide;
+
+
+
+
+
+
+
+
 group = handles.group;
 stats = handles.stats;
 save([get(handles.text_save_dir,'String') '\output.mat'],'stats','group'); %,'statsWide');
