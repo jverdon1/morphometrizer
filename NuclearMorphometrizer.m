@@ -90,8 +90,8 @@ C1Files = cell(length(Files),1);
 C2Files = cell(length(Files),1);
 C3Files = cell(length(Files),1); %Uncomment for loading C3 images
 C4Files = cell(length(Files),1);
-C5Files = cell(length(Files),1);
-C6Files = cell(length(Files),1);
+%C5Files = cell(length(Files),1);
+%C6Files = cell(length(Files),1);
 
 handles.imgCount = 0;
 handles.filesLoaded = 1;
@@ -105,8 +105,8 @@ for i = 1:length(Files);
     k = strfind(Files(i).name,'C2-');
     l = strfind(Files(i).name,'C3-'); %Uncomment for loading C3 images
     m = strfind(Files(i).name,'C4-');
-    n = strfind(Files(i).name,'C5-');
-    o = strfind(Files(i).name,'C6-');
+   % n = strfind(Files(i).name,'C5-');
+   % o = strfind(Files(i).name,'C6-');
     
     if isempty(j) == 0
         C1Files{i} = Files(i).name;
@@ -116,10 +116,10 @@ for i = 1:length(Files);
         C3Files{i} = Files(i).name; %Uncomment for loading C3 images
     elseif isempty(m) == 0
         C4Files{i} = Files(i).name;
-    elseif isempty(n) == 0
-        C5Files{i} = Files(i).name;
-    elseif isempty(o) == 0
-        C6Files{i} = Files(i).name;
+   % elseif isempty(n) == 0
+       % C5Files{i} = Files(i).name;
+   % elseif isempty(o) == 0
+       % C6Files{i} = Files(i).name;
     else
         ColorFiles{i} = Files(i).name;
     end
@@ -132,15 +132,15 @@ C1Files(all(cellfun('isempty',C1Files),2),:) = [];
 C2Files(all(cellfun('isempty',C2Files),2),:) = [];
 C3Files(all(cellfun('isempty',C3Files),2),:) = [];
 C4Files(all(cellfun('isempty',C4Files),2),:) = [];
-C5Files(all(cellfun('isempty',C5Files),2),:) = [];
-C6Files(all(cellfun('isempty',C6Files),2),:) = [];
+% C5Files(all(cellfun('isempty',C5Files),2),:) = [];
+% C6Files(all(cellfun('isempty',C6Files),2),:) = [];
 
 handles.C1Files = C1Files;
 handles.C2Files = C2Files;
 handles.C3Files = C3Files;
 handles.C4Files = C4Files;
-handles.C5Files = C5Files;
-handles.C6Files = C6Files;
+% handles.C5Files = C5Files;
+% handles.C6Files = C6Files;
 handles.ColorFiles = ColorFiles;
 guidata(hObject,handles);
 
@@ -200,16 +200,16 @@ pause(.25);
         handles.Ic2 = struct; 
         handles.Ic3 = struct;
         handles.Ic4 = struct; 
-        handles.Ic5 = struct;
-        handles.Ic6 = struct; handles.Ifull = struct;
+%         handles.Ic5 = struct;
+%         handles.Ic6 = struct; handles.Ifull = struct;
         [handles.bwl(1:length(handles.ColorFiles)).bw] = deal([]);
         [handles.bwl(1:length(handles.ColorFiles)).Icut] = deal([]);
         [handles.Ic1(1:length(handles.ColorFiles)).Image] = deal([]);
       [handles.Ic2(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.Ic3(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.Ic4(1:length(handles.ColorFiles)).Image] = deal([]);
-         [handles.Ic5(1:length(handles.ColorFiles)).Image] = deal([]);
-          [handles.Ic6(1:length(handles.ColorFiles)).Image] = deal([]);
+%          [handles.Ic5(1:length(handles.ColorFiles)).Image] = deal([]);
+%           [handles.Ic6(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.Ifull(1:length(handles.ColorFiles)).Image] = deal([]);
         [handles.group(1:length(handles.ColorFiles)).class] = deal([]);
         guidata(hObject,handles);
@@ -233,11 +233,11 @@ pause(.25);
     handles.Ic4(handles.imgCount+1).Image = ...
         imread(handles.C4Files{handles.imgCount+1});
     
-     handles.Ic5(handles.imgCount+1).Image = ...
-        imread(handles.C5Files{handles.imgCount+1});
-    
-     handles.Ic6(handles.imgCount+1).Image = ...
-        imread(handles.C6Files{handles.imgCount+1});
+%      handles.Ic5(handles.imgCount+1).Image = ...
+%         imread(handles.C5Files{handles.imgCount+1});
+%     
+%      handles.Ic6(handles.imgCount+1).Image = ...
+%         imread(handles.C6Files{handles.imgCount+1});
     
     handles.Ifull(handles.imgCount+1).Image = ...
         imread(handles.ColorFiles{handles.imgCount+1});
@@ -255,7 +255,7 @@ pause(.25);
     Blur = 2;
     ThresholdC1 = 0.3;
     ThresholdC2 = 0.3;
-    ThresholdC4 = 0.15;
+    ThresholdC4 = 0.3;
     minArea = 200; maxArea = 1*10^10;
     WaterShedRegressConst = 2;
     
@@ -296,7 +296,7 @@ pause(.25);
     AreaC1 = [handles.statsC1.Area].';
     delIndC1 = zeros(1,length(AreaC1));
     
-   
+   handles.group(handles.imgCount+1).class = zeros(length(handles.statsC1),1);
     % Define perimeter of cytoplasm using C2
 %     
     IeqC2 = adapthisteq(handles.Ic2(handles.imgCount+1).Image);
@@ -362,7 +362,7 @@ pause(.25);
 %Begin drawing C4 perimeter
 
    
-    handles.group = zeros(length(handles.statsC4),1);
+    
     guidata(hObject,handles);
      
     Segout = handles.Ifull(handles.imgCount+1).Image;
@@ -493,7 +493,7 @@ end
 
 % handles.group(handles.imgCount+1).class = zeros(length(handles.stats(handles.imgCount+1)),1);
 % handles.group(handles.imgCount+1).class(Nuclearids) = 1;
-handles.group(Nuclearids) = 1;
+handles.group(handles.imgCount+1).class(Nuclearids) = 1;
 % Nuclearids
 % for k = 1 : numel(handles.stats)
 %     
@@ -605,7 +605,7 @@ end
 
 % amount of c4 in c1 nucleolin in nucleus
 
-C4img = handles(handles.imgCount+1).Ic4;
+C4img = handles.Ic4;
 
 C4overC1 = struct;
 [C4overC1(1:length(handles.statsC1)).Ic4] = deal([]);
@@ -615,7 +615,7 @@ C4overC1sum = zeros(length(handles.statsC1),1);
 for i = 1:length(handles.statsC1)
   
     C4overC1(i).Ic4 = im2double(handles.statsC1(i).Image);
-    C4overC1(i).pixels = C4img.Image(handles.statsC1(i).PixelIdxList);
+    C4overC1(i).pixels = C4img(handles.imgCount+1).Image(handles.statsC1(i).PixelIdxList);
     temp= find(C4overC1(i).Ic4); C4overC1(i).Ic4(temp) = C4overC1(i).pixels;
     C4overC1sum(i) = sum(C4overC1(i).pixels);
 
@@ -641,7 +641,7 @@ C4overC2sum = zeros(length(minDistIdx2),1);
 for i = 1:length(minDistIdx2)
   
     C4overC2(i).Ic4 = im2double(handles.statsC2(minDistIdx2(i)).Image);
-    C4overC2(i).pixels = C4img.Image(handles.statsC2(minDistIdx2(i)).PixelIdxList);
+    C4overC2(i).pixels = C4img(handles.imgCount+1).Image(handles.statsC2(minDistIdx2(i)).PixelIdxList);
     temp= find(C4overC2(i).Ic4); C4overC2(i).Ic4(temp) = C4overC2(i).pixels;
     C4overC2sum(i) = sum(C4overC2(i).pixels);
 
@@ -653,7 +653,7 @@ end
 % amount of c3 in c1 counterstain in "cell" 
 
 
-C3img = handles(handles.imgCount+1).Ic3;
+C3img = handles.Ic3;
 
 C3overC1 = struct;
 [C3overC1(1:length(handles.statsC1)).Ic3] = deal([]);
@@ -662,7 +662,7 @@ C3overC1sum = zeros(length(handles.statsC1),1);
 for i = 1:length(handles.statsC1)
   
     C3overC1(i).Ic3 = im2double(handles.statsC1(i).Image);
-    C3overC1(i).pixels = C3img.Image(handles.statsC1(i).PixelIdxList);
+    C3overC1(i).pixels = C3img(handles.imgCount+1).Image(handles.statsC1(i).PixelIdxList);
     temp= find(C3overC1(i).Ic3); C3overC1(i).Ic3(temp) = C3overC1(i).pixels;
     C3overC1sum(i) = sum(C3overC1(i).pixels);
 
@@ -749,11 +749,11 @@ equation = a*AreaC1+b*C1sum+(c*AreaC2./minDist2)+(d*C2sum./minDist2)...
 %     
     outputFile = handles.ColorFiles{handles.imgCount+1};
    
-    statsC1 = handles.statsC1; group = handles.group; 
+    statsC1 = handles.statsC1; group = handles.group(handles.imgCount+1).class; 
 %     dna = handles.dna; NucRatio = handles.NucRatio;
 %     disp('Hey still alive')
 %     imgCapt = getframe(handles.image_frame); imgCapt = imgCapt.cdata;
-     save([get(handles.text_save_dir,'String') '\' outputFile '.mat'], 'equation','group');
+     save([get(handles.text_save_dir,'String') '\' outputFile '.mat'], 'eqData','group');
 %      imwrite(imgCapt,[get(handles.text_save_dir,'String') '\' outputFile]);
 %     print(handles.image_frame,strcat(handles.ColorFiles{handles.imgCount},...
 %         '.annotated.jpg'),'-djpeg');
